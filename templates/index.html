@@ -31,73 +31,75 @@
         </header>
 
         <main class="views-container">
-            <!-- SCAN VIEW -->
-            <section id="view-scan" class="view active" data-view="scan">
+            <!-- ADD VIEW (Manual Entry) -->
+            <section id="view-add" class="view active" data-view="add">
                 <div class="view-content">
-                    <div id="upload-area" class="upload-area">
-                        <div class="upload-zone" id="drop-zone">
-                            <div class="upload-icon">📸</div>
-                            <p class="upload-title">Scan Your Meal</p>
-                            <p class="upload-sub">Take a photo or upload an image</p>
-                            <div class="upload-actions">
-                                <button id="btn-camera" class="btn btn-primary"><span class="btn-icon">📷</span> Camera</button>
-                                <button id="btn-upload" class="btn btn-secondary"><span class="btn-icon">📁</span> Upload</button>
+                    <div class="section-header"><h2>➕ Quick Log</h2></div>
+                    
+                    <div class="manual-log-card glass-card">
+                        <h3 class="card-title">📝 Manual Entry</h3>
+                        <form id="manual-log-form" class="manual-form">
+                            <div class="form-group">
+                                <label for="food-name">🍲 Food Name</label>
+                                <input type="text" id="food-name" class="form-input" placeholder="e.g. Grilled Chicken Salad" required>
                             </div>
-                            <input type="file" id="file-input" accept="image/*" hidden>
-                            <input type="file" id="camera-input" accept="image/*" capture="environment" hidden>
-                        </div>
+                            <div class="nutrition-input-grid">
+                                <div class="form-group">
+                                    <label for="food-calories">🔥 Cal</label>
+                                    <input type="number" id="food-calories" class="form-input" placeholder="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="food-protein">💪 Pro (g)</label>
+                                    <input type="number" id="food-protein" class="form-input" placeholder="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="food-carbs">🌾 Carb (g)</label>
+                                    <input type="number" id="food-carbs" class="form-input" placeholder="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="food-fat">🥑 Fat (g)</label>
+                                    <input type="number" id="food-fat" class="form-input" placeholder="0">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-full btn-glow">
+                                <span class="btn-icon">✅</span> Log Meal
+                            </button>
+                        </form>
                     </div>
-                    <div id="preview-area" class="preview-area hidden">
-                        <div class="preview-card">
-                            <img id="preview-img" class="preview-img" alt="Food preview">
-                            <div class="preview-actions">
-                                <button id="btn-retake" class="btn btn-ghost">↩ Retake</button>
-                                <button id="btn-analyze" class="btn btn-primary btn-glow"><span class="btn-icon">🔬</span> Analyze</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="scanning-overlay" class="scanning-overlay hidden">
-                        <div class="scanner"><div class="scanner-line"></div></div>
-                        <p class="scanning-text">Analyzing your meal...</p>
-                        <div class="scanning-dots"><span></span><span></span><span></span></div>
-                    </div>
-                    <div id="results-area" class="results-area hidden">
-                        <div class="result-score-card glass-card">
-                            <div class="score-ring-container">
-                                <svg class="score-ring" viewBox="0 0 120 120">
-                                    <circle class="score-ring-bg" cx="60" cy="60" r="52"/>
-                                    <circle id="score-ring-fill" class="score-ring-fill" cx="60" cy="60" r="52"/>
-                                </svg>
-                                <div class="score-value"><span id="score-number">0</span><span class="score-max">/10</span></div>
-                            </div>
-                            <div class="score-info">
-                                <span id="score-label" class="score-label">Analyzing...</span>
-                                <p id="health-notes" class="health-notes"></p>
-                            </div>
-                        </div>
-                        <div class="nutrition-grid">
-                            <div class="nutri-card glass-card" data-type="calories"><span class="nutri-icon">🔥</span><span id="result-calories" class="nutri-value">0</span><span class="nutri-label">Calories</span></div>
-                            <div class="nutri-card glass-card" data-type="protein"><span class="nutri-icon">💪</span><span id="result-protein" class="nutri-value">0g</span><span class="nutri-label">Protein</span></div>
-                            <div class="nutri-card glass-card" data-type="carbs"><span class="nutri-icon">🌾</span><span id="result-carbs" class="nutri-value">0g</span><span class="nutri-label">Carbs</span></div>
-                            <div class="nutri-card glass-card" data-type="fat"><span class="nutri-icon">🥑</span><span id="result-fat" class="nutri-value">0g</span><span class="nutri-label">Fat</span></div>
-                        </div>
-                        <div class="food-items-card glass-card">
-                            <h3 class="card-title">🍽️ Detected Foods</h3>
-                            <div id="food-items-list" class="food-items-list"></div>
-                        </div>
-                        <div id="suggestions-card" class="suggestions-card glass-card">
-                            <h3 class="card-title">💡 AI Suggestion</h3>
-                            <p id="suggestion-text" class="suggestion-text"></p>
-                        </div>
-                        <div class="result-actions">
-                            <button id="btn-log-meal" class="btn btn-primary btn-full"><span class="btn-icon">✅</span> Log This Meal</button>
-                            <button id="btn-get-alternatives" class="btn btn-accent btn-full"><span class="btn-icon">🔄</span> Healthier Alternatives</button>
-                            <button id="btn-scan-new" class="btn btn-ghost btn-full">Scan Another Meal</button>
-                        </div>
-                        <div id="alternatives-area" class="alternatives-area hidden">
-                            <h3 class="card-title">🥗 Healthier Swaps</h3>
-                            <div id="alternatives-list" class="alternatives-list"></div>
-                            <p id="overall-tip" class="overall-tip"></p>
+
+                    <div class="quick-add-section">
+                        <h3 class="card-title">⚡ Quick Add</h3>
+                        <div class="quick-add-grid">
+                            <button class="quick-add-btn glass-card" onclick="quickAdd('Apple', 95, 0.5, 25, 0.3)">
+                                <span class="quick-icon">🍎</span>
+                                <span class="quick-name">Apple</span>
+                                <span class="quick-cal">95 cal</span>
+                            </button>
+                            <button class="quick-add-btn glass-card" onclick="quickAdd('Banana', 105, 1.3, 27, 0.4)">
+                                <span class="quick-icon">🍌</span>
+                                <span class="quick-name">Banana</span>
+                                <span class="quick-cal">105 cal</span>
+                            </button>
+                            <button class="quick-add-btn glass-card" onclick="quickAdd('Oatmeal', 150, 5, 27, 3)">
+                                <span class="quick-icon">🥣</span>
+                                <span class="quick-name">Oatmeal</span>
+                                <span class="quick-cal">150 cal</span>
+                            </button>
+                            <button class="quick-add-btn glass-card" onclick="quickAdd('Chicken Breast', 165, 31, 0, 3.6)">
+                                <span class="quick-icon">🍗</span>
+                                <span class="quick-name">Chicken</span>
+                                <span class="quick-cal">165 cal</span>
+                            </button>
+                            <button class="quick-add-btn glass-card" onclick="quickAdd('Black Coffee', 2, 0.3, 0, 0)">
+                                <span class="quick-icon">☕</span>
+                                <span class="quick-name">Coffee</span>
+                                <span class="quick-cal">2 cal</span>
+                            </button>
+                            <button class="quick-add-btn glass-card" onclick="quickAdd('Egg (Large)', 70, 6, 0.6, 5)">
+                                <span class="quick-icon">🥚</span>
+                                <span class="quick-name">Egg</span>
+                                <span class="quick-cal">70 cal</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -120,8 +122,8 @@
                         <div class="empty-state" id="log-empty">
                             <div class="empty-icon">🍽️</div>
                             <p class="empty-title">No meals logged yet</p>
-                            <p class="empty-sub">Scan your first meal to start tracking!</p>
-                            <button class="btn btn-primary" onclick="switchTab('scan')"><span class="btn-icon">📸</span> Scan a Meal</button>
+                            <p class="empty-sub">Add your first meal to start tracking!</p>
+                            <button class="btn btn-primary" onclick="switchTab('add')"><span class="btn-icon">➕</span> Add a Meal</button>
                         </div>
                     </div>
                 </div>
@@ -142,12 +144,8 @@
                         <div class="macro-ring-card glass-card"><canvas id="fat-ring" width="100" height="100"></canvas><div class="macro-ring-info"><span class="macro-ring-value" id="dash-fat">0g</span><span class="macro-ring-label">Fat</span><span class="macro-ring-goal" id="dash-fat-goal">/ 65g</span></div></div>
                     </div>
                     <div class="avg-score-card glass-card">
-                        <div class="avg-score-info"><span class="avg-score-label">Average Meal Score</span><span class="avg-score-desc">Based on AI analysis</span></div>
-                        <div class="avg-score-value" id="dash-avg-score">—</div>
-                    </div>
-                    <div class="suggest-card glass-card">
-                        <h3 class="card-title">🤖 AI Meal Suggestion</h3>
-                        <div id="meal-suggestion"><button id="btn-suggest" class="btn btn-accent btn-full"><span class="btn-icon">✨</span> Get Next Meal Idea</button></div>
+                        <div class="avg-score-info"><span class="avg-score-label">Track Regularly</span><span class="avg-score-desc">Consistency is key!</span></div>
+                        <div class="avg-score-value" id="dash-avg-score">✨</div>
                     </div>
                 </div>
             </section>
@@ -169,8 +167,8 @@
                     </div>
                     <div class="about-card glass-card">
                         <h3 class="card-title">ℹ️ About NutriScan</h3>
-                        <p class="about-text">NutriScan uses <strong>Google Gemini AI</strong> to analyze food photos and provide instant nutritional insights, health scores, and personalized recommendations.</p>
-                        <div class="about-tech"><span class="tech-badge">Gemini 2.0 Flash</span><span class="tech-badge">Python / Flask</span><span class="tech-badge">GCP Cloud Run</span></div>
+                        <p class="about-text">NutriScan helps you track your daily nutritional intake with ease. Set goals, log meals, and visualize your progress.</p>
+                        <div class="about-tech"><span class="tech-badge">Python / Flask</span><span class="tech-badge">GCP Cloud Run</span></div>
                         <p class="about-footer">Built for AMD Slingshot 2026 🚀</p>
                     </div>
                 </div>
@@ -178,7 +176,12 @@
         </main>
 
         <nav class="tab-bar">
-            <button class="tab active" data-tab="scan" id="tab-scan" onclick="switchTab('scan')"><span class="tab-icon">📸</span><span class="tab-label">Scan</span></button>
+            <button class="tab active" data-tab="add" id="tab-add" onclick="switchTab('add')"><span class="tab-icon">➕</span><span class="tab-label">Add</span></button>
+            <button class="tab" data-tab="log" id="tab-log" onclick="switchTab('log')"><span class="tab-icon">📋</span><span class="tab-label">Log</span></button>
+            <button class="tab" data-tab="dashboard" id="tab-dashboard" onclick="switchTab('dashboard')"><span class="tab-icon">📊</span><span class="tab-label">Dashboard</span></button>
+            <button class="tab" data-tab="profile" id="tab-profile" onclick="switchTab('profile')"><span class="tab-icon">⚙️</span><span class="tab-label">Settings</span></button>
+            <div class="tab-indicator" id="tab-indicator"></div>
+        </nav>
             <button class="tab" data-tab="log" id="tab-log" onclick="switchTab('log')"><span class="tab-icon">📋</span><span class="tab-label">Log</span></button>
             <button class="tab" data-tab="dashboard" id="tab-dashboard" onclick="switchTab('dashboard')"><span class="tab-icon">📊</span><span class="tab-label">Dashboard</span></button>
             <button class="tab" data-tab="profile" id="tab-profile" onclick="switchTab('profile')"><span class="tab-icon">⚙️</span><span class="tab-label">Settings</span></button>
