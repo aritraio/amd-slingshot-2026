@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NutriScan — AI Food & Health Tracker</title>
+    <meta name="description" content="AI-powered nutritional analysis and health tracking.">
+    <meta name="theme-color" content="#0a0f1c">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="splash" class="splash">
+        <div class="splash-icon">🥗</div>
+        <div class="splash-title">NutriScan</div>
+        <div class="splash-sub">AI-Powered Nutrition</div>
+        <div class="splash-loader"><div class="splash-bar"></div></div>
+    </div>
+
+    <div id="app" class="app hidden">
+        <header class="header">
+            <div class="header-left">
+                <span class="header-icon">🥗</span>
+                <h1 class="header-title">NutriScan</h1>
+            </div>
+            <div class="header-right">
+                <span id="header-date" class="header-date"></span>
+            </div>
+        </header>
+
+        <main class="views-container">
+            <!-- SCAN VIEW -->
+            <section id="view-scan" class="view active" data-view="scan">
+                <div class="view-content">
+                    <div id="upload-area" class="upload-area">
+                        <div class="upload-zone" id="drop-zone">
+                            <div class="upload-icon">📸</div>
+                            <p class="upload-title">Scan Your Meal</p>
+                            <p class="upload-sub">Take a photo or upload an image</p>
+                            <div class="upload-actions">
+                                <button id="btn-camera" class="btn btn-primary"><span class="btn-icon">📷</span> Camera</button>
+                                <button id="btn-upload" class="btn btn-secondary"><span class="btn-icon">📁</span> Upload</button>
+                            </div>
+                            <input type="file" id="file-input" accept="image/*" hidden>
+                            <input type="file" id="camera-input" accept="image/*" capture="environment" hidden>
+                        </div>
+                    </div>
+                    <div id="preview-area" class="preview-area hidden">
+                        <div class="preview-card">
+                            <img id="preview-img" class="preview-img" alt="Food preview">
+                            <div class="preview-actions">
+                                <button id="btn-retake" class="btn btn-ghost">↩ Retake</button>
+                                <button id="btn-analyze" class="btn btn-primary btn-glow"><span class="btn-icon">🔬</span> Analyze</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="scanning-overlay" class="scanning-overlay hidden">
+                        <div class="scanner"><div class="scanner-line"></div></div>
+                        <p class="scanning-text">Analyzing your meal...</p>
+                        <div class="scanning-dots"><span></span><span></span><span></span></div>
+                    </div>
+                    <div id="results-area" class="results-area hidden">
+                        <div class="result-score-card glass-card">
+                            <div class="score-ring-container">
+                                <svg class="score-ring" viewBox="0 0 120 120">
+                                    <circle class="score-ring-bg" cx="60" cy="60" r="52"/>
+                                    <circle id="score-ring-fill" class="score-ring-fill" cx="60" cy="60" r="52"/>
+                                </svg>
+                                <div class="score-value"><span id="score-number">0</span><span class="score-max">/10</span></div>
+                            </div>
+                            <div class="score-info">
+                                <span id="score-label" class="score-label">Analyzing...</span>
+                                <p id="health-notes" class="health-notes"></p>
+                            </div>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutri-card glass-card" data-type="calories"><span class="nutri-icon">🔥</span><span id="result-calories" class="nutri-value">0</span><span class="nutri-label">Calories</span></div>
+                            <div class="nutri-card glass-card" data-type="protein"><span class="nutri-icon">💪</span><span id="result-protein" class="nutri-value">0g</span><span class="nutri-label">Protein</span></div>
+                            <div class="nutri-card glass-card" data-type="carbs"><span class="nutri-icon">🌾</span><span id="result-carbs" class="nutri-value">0g</span><span class="nutri-label">Carbs</span></div>
+                            <div class="nutri-card glass-card" data-type="fat"><span class="nutri-icon">🥑</span><span id="result-fat" class="nutri-value">0g</span><span class="nutri-label">Fat</span></div>
+                        </div>
+                        <div class="food-items-card glass-card">
+                            <h3 class="card-title">🍽️ Detected Foods</h3>
+                            <div id="food-items-list" class="food-items-list"></div>
+                        </div>
+                        <div id="suggestions-card" class="suggestions-card glass-card">
+                            <h3 class="card-title">💡 AI Suggestion</h3>
+                            <p id="suggestion-text" class="suggestion-text"></p>
+                        </div>
+                        <div class="result-actions">
+                            <button id="btn-log-meal" class="btn btn-primary btn-full"><span class="btn-icon">✅</span> Log This Meal</button>
+                            <button id="btn-get-alternatives" class="btn btn-accent btn-full"><span class="btn-icon">🔄</span> Healthier Alternatives</button>
+                            <button id="btn-scan-new" class="btn btn-ghost btn-full">Scan Another Meal</button>
+                        </div>
+                        <div id="alternatives-area" class="alternatives-area hidden">
+                            <h3 class="card-title">🥗 Healthier Swaps</h3>
+                            <div id="alternatives-list" class="alternatives-list"></div>
+                            <p id="overall-tip" class="overall-tip"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LOG VIEW -->
+            <section id="view-log" class="view" data-view="log">
+                <div class="view-content">
+                    <div class="section-header"><h2>📋 Today's Food Log</h2><span id="log-meal-count" class="badge">0 meals</span></div>
+                    <div class="quick-stats glass-card">
+                        <div class="quick-stat"><span class="quick-stat-value" id="log-total-cal">0</span><span class="quick-stat-label">Calories</span></div>
+                        <div class="quick-stat-divider"></div>
+                        <div class="quick-stat"><span class="quick-stat-value" id="log-total-protein">0g</span><span class="quick-stat-label">Protein</span></div>
+                        <div class="quick-stat-divider"></div>
+                        <div class="quick-stat"><span class="quick-stat-value" id="log-total-carbs">0g</span><span class="quick-stat-label">Carbs</span></div>
+                        <div class="quick-stat-divider"></div>
+                        <div class="quick-stat"><span class="quick-stat-value" id="log-total-fat">0g</span><span class="quick-stat-label">Fat</span></div>
+                    </div>
+                    <div id="meal-timeline" class="meal-timeline">
+                        <div class="empty-state" id="log-empty">
+                            <div class="empty-icon">🍽️</div>
+                            <p class="empty-title">No meals logged yet</p>
+                            <p class="empty-sub">Scan your first meal to start tracking!</p>
+                            <button class="btn btn-primary" onclick="switchTab('scan')"><span class="btn-icon">📸</span> Scan a Meal</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DASHBOARD VIEW -->
+            <section id="view-dashboard" class="view" data-view="dashboard">
+                <div class="view-content">
+                    <div class="section-header"><h2>📊 Dashboard</h2><span id="dash-date" class="badge">Today</span></div>
+                    <div class="calorie-card glass-card">
+                        <div class="calorie-header"><span class="calorie-title">Daily Calories</span><span class="calorie-count"><span id="dash-cal-current">0</span> <span class="calorie-divider">/</span> <span id="dash-cal-goal">2000</span></span></div>
+                        <div class="calorie-bar-track"><div id="calorie-bar-fill" class="calorie-bar-fill" style="width:0%"></div></div>
+                        <div class="calorie-remaining"><span id="dash-cal-remaining">2000</span> calories remaining</div>
+                    </div>
+                    <div class="macro-rings-grid">
+                        <div class="macro-ring-card glass-card"><canvas id="protein-ring" width="100" height="100"></canvas><div class="macro-ring-info"><span class="macro-ring-value" id="dash-protein">0g</span><span class="macro-ring-label">Protein</span><span class="macro-ring-goal" id="dash-protein-goal">/ 150g</span></div></div>
+                        <div class="macro-ring-card glass-card"><canvas id="carbs-ring" width="100" height="100"></canvas><div class="macro-ring-info"><span class="macro-ring-value" id="dash-carbs">0g</span><span class="macro-ring-label">Carbs</span><span class="macro-ring-goal" id="dash-carbs-goal">/ 250g</span></div></div>
+                        <div class="macro-ring-card glass-card"><canvas id="fat-ring" width="100" height="100"></canvas><div class="macro-ring-info"><span class="macro-ring-value" id="dash-fat">0g</span><span class="macro-ring-label">Fat</span><span class="macro-ring-goal" id="dash-fat-goal">/ 65g</span></div></div>
+                    </div>
+                    <div class="avg-score-card glass-card">
+                        <div class="avg-score-info"><span class="avg-score-label">Average Meal Score</span><span class="avg-score-desc">Based on AI analysis</span></div>
+                        <div class="avg-score-value" id="dash-avg-score">—</div>
+                    </div>
+                    <div class="suggest-card glass-card">
+                        <h3 class="card-title">🤖 AI Meal Suggestion</h3>
+                        <div id="meal-suggestion"><button id="btn-suggest" class="btn btn-accent btn-full"><span class="btn-icon">✨</span> Get Next Meal Idea</button></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROFILE VIEW -->
+            <section id="view-profile" class="view" data-view="profile">
+                <div class="view-content">
+                    <div class="section-header"><h2>⚙️ Goals & Settings</h2></div>
+                    <div class="goals-card glass-card">
+                        <h3 class="card-title">🎯 Daily Nutrition Goals</h3>
+                        <p class="card-desc">Set your daily targets to track progress</p>
+                        <form id="goals-form" class="goals-form">
+                            <div class="form-group"><label for="goal-calories">🔥 Calories (kcal)</label><input type="number" id="goal-calories" class="form-input" value="2000" min="500" max="10000"></div>
+                            <div class="form-group"><label for="goal-protein">💪 Protein (g)</label><input type="number" id="goal-protein" class="form-input" value="150" min="10" max="500"></div>
+                            <div class="form-group"><label for="goal-carbs">🌾 Carbs (g)</label><input type="number" id="goal-carbs" class="form-input" value="250" min="10" max="1000"></div>
+                            <div class="form-group"><label for="goal-fat">🥑 Fat (g)</label><input type="number" id="goal-fat" class="form-input" value="65" min="10" max="300"></div>
+                            <button type="submit" class="btn btn-primary btn-full"><span class="btn-icon">💾</span> Save Goals</button>
+                        </form>
+                    </div>
+                    <div class="about-card glass-card">
+                        <h3 class="card-title">ℹ️ About NutriScan</h3>
+                        <p class="about-text">NutriScan uses <strong>Google Gemini AI</strong> to analyze food photos and provide instant nutritional insights, health scores, and personalized recommendations.</p>
+                        <div class="about-tech"><span class="tech-badge">Gemini 2.0 Flash</span><span class="tech-badge">Python / Flask</span><span class="tech-badge">GCP Cloud Run</span></div>
+                        <p class="about-footer">Built for AMD Slingshot 2026 🚀</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <button class="tab active" data-tab="scan" id="tab-scan" onclick="switchTab('scan')"><span class="tab-icon">📸</span><span class="tab-label">Scan</span></button>
+            <button class="tab" data-tab="log" id="tab-log" onclick="switchTab('log')"><span class="tab-icon">📋</span><span class="tab-label">Log</span></button>
+            <button class="tab" data-tab="dashboard" id="tab-dashboard" onclick="switchTab('dashboard')"><span class="tab-icon">📊</span><span class="tab-label">Dashboard</span></button>
+            <button class="tab" data-tab="profile" id="tab-profile" onclick="switchTab('profile')"><span class="tab-icon">⚙️</span><span class="tab-label">Settings</span></button>
+            <div class="tab-indicator" id="tab-indicator"></div>
+        </nav>
+
+        <div id="toast" class="toast hidden"><span id="toast-icon" class="toast-icon">✅</span><span id="toast-msg" class="toast-msg"></span></div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/camera.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/recommendations.js"></script>
+</body>
+</html>
