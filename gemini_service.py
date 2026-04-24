@@ -12,7 +12,10 @@ RETRY_DELAY = 2
 
 
 # Initialize Gemini client
-client = genai.Client(api_key=Config.GOOGLE_API_KEY)
+if Config.GOOGLE_API_KEY:
+    client = genai.Client(api_key=Config.GOOGLE_API_KEY)
+else:
+    client = None
 
 FOOD_ANALYSIS_PROMPT = """You are a professional nutritionist AI. Analyze the food in this image carefully.
 
@@ -124,6 +127,9 @@ def _extract_json(text):
 
 def _call_gemini(contents, temperature=0.5, max_tokens=2048):
     """Call Gemini with model fallback and retry logic."""
+    if client is None:
+        raise ValueError("Google API key is not configured. Please set GOOGLE_API_KEY environment variable.")
+        
     models_to_try = [Config.GEMINI_MODEL, "gemini-2.0-flash-lite", "gemini-2.0-flash-001"]
     last_error = None
     
