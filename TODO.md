@@ -7,25 +7,21 @@
 ## ✅ Phase 1: Backend Core (15 min)
 
 ### Setup
-- [x] Create `requirements.txt` — Flask, gunicorn, google-genai, Pillow
-- [x] Create `config.py` — env-based config (GOOGLE_API_KEY, PORT)
+- [x] Create `requirements.txt` — Flask, gunicorn, Pillow
+- [x] Create `config.py` — env-based config (PORT)
 
-### AI Service
-- [x] Create `gemini_service.py`
-  - [x] `analyze_food_image(image_base64)` → structured nutrition JSON
-  - [x] `get_healthier_alternatives(food_items)` → healthier swap suggestions
-  - [x] `get_meal_plan_suggestion(goals, history)` → next meal recommendation
+### Data Service
+- [x] Create manual logging structure
+- [x] Implement in-memory session storage
 
 ### API Server
 - [x] Create `app.py`
-  - [x] `POST /api/analyze` — food image → nutrition analysis
   - [x] `POST /api/log-meal` — save meal to session
   - [x] `GET /api/meals` — retrieve meal history
   - [x] `GET /api/daily-summary` — aggregated daily totals
-  - [x] `POST /api/recommend` — healthier alternatives
   - [x] `POST /api/set-goals` — set calorie/macro targets
   - [x] `GET /api/goals` — get current targets
-- [x] Smoke test: `python app.py` → test `/api/analyze`
+- [x] Smoke test: `python app.py`
 
 ---
 
@@ -35,41 +31,27 @@
 - [x] Create `static/css/style.css`
   - [x] CSS custom properties (colors, fonts, spacing)
   - [x] Dark mode base (#0a0f1c background)
-  - [x] Glassmorphism card components (backdrop-filter)
-  - [x] Animated tab navigation bar
-  - [x] Circular progress rings (SVG/CSS)
-  - [x] Food result cards with nutrition chips
-  - [x] Loading skeleton animations
+  - [x] Glassmorphism card components
+  - [x] Manual entry form styling
+  - [x] Quick-add buttons grid
   - [x] Mobile-first responsive layout
-  - [x] Micro-animations (hover, transitions)
 
 ### HTML Structure
 - [x] Create `templates/index.html`
-  - [x] Meta tags, Google Fonts (Inter), favicon
-  - [x] Tab bar: Scan | Log | Dashboard | Profile
-  - [x] Scan view: camera preview, upload btn, results area
-  - [x] Log view: meal timeline, daily total summary
-  - [x] Dashboard view: calorie bar, macro chart, meal list
-  - [x] Profile view: goal settings form, about section
+  - [x] Tab bar: Add | Log | Dashboard | Profile
+  - [x] Add view: Manual form, Quick-pick tiles
+  - [x] Log view: meal timeline, daily summary
+  - [x] Dashboard view: calorie progress, macro charts
 
 ### JavaScript Modules
 - [x] Create `static/js/app.js`
   - [x] SPA tab router
-  - [x] Global state (meals[], goals{}, currentAnalysis)
+  - [x] Manual entry handler
+  - [x] Quick-add logic
   - [x] API client (fetch wrapper)
-  - [x] Init & event listeners
-- [x] Create `static/js/camera.js`
-  - [x] getUserMedia camera access
-  - [x] Canvas photo capture
-  - [x] File upload (drag & drop + file picker)
-  - [x] Image → base64 conversion
-  - [x] Submit to /api/analyze
-  - [x] Render analysis results
 - [x] Create `static/js/dashboard.js`
-  - [x] Calorie progress bar (animated)
-  - [x] Macro donut chart (Canvas 2D)
-  - [x] Meal timeline renderer
-  - [x] Daily summary cards
+  - [x] Calorie progress bar
+  - [x] Macro donut charts
 - [x] Create `static/js/recommendations.js`
   - [x] Healthier alternative cards
   - [x] Before/after comparison
@@ -80,18 +62,18 @@
 ## ✅ Phase 3: Integration & Polish (10 min)
 
 ### End-to-End Testing
-- [x] Test: Upload food photo → see analysis results
-- [x] Test: Log meal → appears in meal log
-- [x] Test: Dashboard → shows correct totals & charts
-- [x] Test: Recommendations → displays alternatives
-- [x] Test: Goal setting → progress tracking updates
+- [x] Test: Manual entry → meal logged correctly
+- [x] Test: Quick-add buttons → log meal with one tap
+- [x] Test: Log view → shows latest entries with macros
+- [x] Test: Dashboard → progress bars update in real-time
+- [x] Test: Settings → changing goals updates dashboard
 
 ### Bug Fixes & Polish
-- [x] Fix any broken API calls
-- [x] Ensure error states display properly
-- [x] Verify loading animations work
-- [x] Check mobile responsiveness
-- [x] Test with 3+ different food images
+- [x] Clean up unused AI code & routes
+- [x] Optimize form layout for mobile
+- [x] Add hover effects to quick-add tiles
+- [x] Ensure smooth transitions between tabs
+- [x] Verify total calorie math
 
 ---
 

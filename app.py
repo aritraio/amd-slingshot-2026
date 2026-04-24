@@ -3,7 +3,6 @@ import uuid
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, session
 from config import Config
-import gemini_service
 
 app = Flask(__name__)
 app.secret_key = Config.SECRET_KEY
@@ -45,17 +44,6 @@ def index():
 
 
 # ─── API Routes ─────────────────────────────────────────────────────────────────
-
-@app.route("/api/analyze", methods=["POST"])
-def analyze_food():
-    """Analyze a food image using Gemini Vision AI."""
-    data = request.get_json()
-    if not data or "image" not in data:
-        return jsonify({"error": "No image provided"}), 400
-
-    result = gemini_service.analyze_food_image(data["image"])
-    return jsonify(result)
-
 
 @app.route("/api/log-meal", methods=["POST"])
 def log_meal():
@@ -137,40 +125,6 @@ def daily_summary():
         "progress": progress,
         "avg_meal_score": avg_score,
     })
-
-
-@app.route("/api/recommend", methods=["POST"])
-def recommend():
-    """Get healthier alternative recommendations."""
-    data = request.get_json()
-    if not data or "foods" not in data:
-        return jsonify({"error": "No food items provided"}), 400
-
-    result = gemini_service.get_healthier_alternatives(data["foods"])
-    return jsonify(result)
-
-
-@app.route("/api/suggest-meal", methods=["GET"])
-def suggest_meal():
-    """Get a meal suggestion based on remaining daily budget."""
-    user_data = _get_user_data()
-    goals = user_data["goals"]
-    
-    today = datetime.now().date().isoformat()
-    today_meals = [
-        m for m in user_data["meals"]
-        if m["timestamp"].startswith(today)
-    ]
-
-    intake = {
-        "calories": sum(m.get("total_calories", 0) for m in today_meals),
-        "protein": sum(m.get("total_protein", 0) for m in today_meals),
-        "carbs": sum(m.get("total_carbs", 0) for m in today_meals),
-        "fat": sum(m.get("total_fat", 0) for m in today_meals),
-    }
-
-    result = gemini_service.get_meal_plan_suggestion(goals, intake)
-    return jsonify(result)
 
 
 @app.route("/api/set-goals", methods=["POST"])
