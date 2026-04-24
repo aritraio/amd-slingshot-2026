@@ -130,7 +130,7 @@ def _call_gemini(contents, temperature=0.5, max_tokens=2048):
     if client is None:
         raise ValueError("Google API key is not configured. Please set GOOGLE_API_KEY environment variable.")
         
-    models_to_try = [Config.GEMINI_MODEL, "gemini-1.5-flash-8b"]
+    models_to_try = [Config.GEMINI_MODEL, Config.GEMINI_MODEL_FALLBACK, "gemini-2.0-flash-lite"]
     last_error = None
     
     for model_name in models_to_try:
