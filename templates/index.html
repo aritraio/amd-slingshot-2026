@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ conference.name }} | Technical Conference</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="hero">
+        <h1>{{ conference.name }}</h1>
+        <p>A deep dive into the future of cloud computing, AI, and data analytics. Join us for a day of technical excellence.</p>
+        <div class="meta">
+            <span>📅 {{ conference.date }}</span>
+            <span>📍 {{ conference.location }}</span>
+        </div>
+    </header>
+
+    <section class="search-container">
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search by Title, Speaker, or Category...">
+        </div>
+    </section>
+
+    <main class="schedule" id="scheduleGrid">
+        {% for talk in conference.talks %}
+        <div class="talk-card {{ 'lunch' if talk.id == 'LUNCH' else '' }}" 
+             data-title="{{ talk.title|lower }}" 
+             data-category="{{ talk.category|lower }}"
+             data-speakers="{{ talk.speakers|map(attribute='firstName')|join(' ')|lower }} {{ talk.speakers|map(attribute='lastName')|join(' ')|lower }}">
+            
+            <div class="talk-time">
+                <div class="time-range">{{ talk.startTime }} - {{ talk.endTime }}</div>
+                {% if talk.ryzenWalkTime != 'N/A' %}
+                <div class="ryzen-walk">⚡ RYZEN Walk: {{ talk.ryzenWalkTime }}</div>
+                {% endif %}
+            </div>
+
+            <div class="talk-content">
+                <span class="talk-category">{{ talk.category }}</span>
+                <h2 class="talk-title">{{ talk.title }}</h2>
+                <p class="talk-description">{{ talk.description }}</p>
+                
+                <div class="speakers">
+                    {% for speaker in talk.speakers %}
+                    <a href="{{ speaker.linkedin }}" target="_blank" class="speaker-link">
+                        👤 {{ speaker.firstName }} {{ speaker.lastName }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </main>
+
+    <footer style="text-align: center; padding: 4rem 2rem; color: var(--text-secondary); border-top: 1px solid var(--glass-border);">
+        <p>&copy; 2024 {{ conference.name }}. All rights reserved.</p>
+        <p style="font-size: 0.8rem; margin-top: 1rem;">Built with Flask, HTML, CSS, and JS.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
