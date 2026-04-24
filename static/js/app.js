@@ -4,9 +4,7 @@
 
 // ─── Global State ──────────────────────────────────────────────
 const state = {
-    currentView: 'scan',
-    currentAnalysis: null,
-    currentImageBase64: null,
+    currentView: 'add',
     meals: [],
     goals: { calories: 2000, protein: 150, carbs: 250, fat: 65 },
 };
@@ -37,11 +35,14 @@ function initApp() {
     // Goals form
     document.getElementById('goals-form').addEventListener('submit', saveGoals);
 
-    // Suggest meal button
-    document.getElementById('btn-suggest').addEventListener('click', suggestMeal);
+    // Manual Log form
+    const manualForm = document.getElementById('manual-log-form');
+    if (manualForm) {
+        manualForm.addEventListener('submit', handleManualSubmit);
+    }
 
     // Set initial tab indicator
-    updateTabIndicator('scan');
+    updateTabIndicator('add');
 }
 
 // ─── Tab Router ────────────────────────────────────────────────
@@ -49,12 +50,17 @@ function switchTab(tab) {
     // Hide all views
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     // Show target
-    document.getElementById(`view-${tab}`).classList.add('active');
+    const targetView = document.getElementById(`view-${tab}`);
+    if (targetView) targetView.classList.add('active');
+    
     // Update tabs
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+    const targetTab = document.querySelector(`.tab[data-tab="${tab}"]`);
+    if (targetTab) targetTab.classList.add('active');
+    
     // Move indicator
     updateTabIndicator(tab);
+    
     // Refresh view data
     state.currentView = tab;
     if (tab === 'log') refreshLog();
@@ -63,10 +69,10 @@ function switchTab(tab) {
 }
 
 function updateTabIndicator(tab) {
-    const tabs = ['scan', 'log', 'dashboard', 'profile'];
+    const tabs = ['add', 'log', 'dashboard', 'profile'];
     const idx = tabs.indexOf(tab);
     const indicator = document.getElementById('tab-indicator');
-    if (indicator) indicator.style.left = `${idx * 25}%`;
+    if (indicator && idx !== -1) indicator.style.left = `${idx * 25}%`;
 }
 
 // ─── API Client ────────────────────────────────────────────────
@@ -129,27 +135,37 @@ async function saveGoals(e) {
     }
 }
 
-// ─── Log Meal ──────────────────────────────────────────────────
-async function logCurrentMeal() {
-    if (!state.currentAnalysis || state.currentAnalysis.error) return;
-    const a = state.currentAnalysis;
+// ─── Manual & Quick Log ───────────────────────────────────────
+async function handleManualSubmit(e) {
+    e.preventDefault();
+    const food = {
+        name: document.getElementById('food-name').value,
+        calories: parseInt(document.getElementById('food-calories').value) || 0,
+        protein: parseInt(document.getElementById('food-protein').value) || 0,
+        carbs: parseInt(document.getElementById('food-carbs').value) || 0,
+        fat: parseInt(document.getElementById('food-fat').value) || 0,
+    };
+    await quickAdd(food.name, food.calories, food.protein, food.carbs, food.fat);
+    e.target.reset();
+}
+
+async function quickAdd(name, cal, pro, carb, fat) {
     const data = await api('/api/log-meal', {
         method: 'POST',
         body: JSON.stringify({
-            foods: a.foods || [],
-            total_calories: a.total_calories || 0,
-            total_protein: a.total_protein || 0,
-            total_carbs: a.total_carbs || 0,
-            total_fat: a.total_fat || 0,
-            total_fiber: a.total_fiber || 0,
-            meal_score: a.meal_score || 5,
-            health_notes: a.health_notes || '',
+            foods: [{ name, calories: cal, protein: pro, carbs: carb, fat: fat }],
+            total_calories: cal,
+            total_protein: pro,
+            total_carbs: carb,
+            total_fat: fat,
+            meal_score: 7, // Default good score
+            health_notes: 'Manual entry'
         }),
     });
     if (data.success) {
-        showToast('✅', 'Meal logged successfully!');
-        document.getElementById('btn-log-meal').disabled = true;
-        document.getElementById('btn-log-meal').textContent = '✅ Meal Logged';
+        showToast('✅', `${name} logged!`);
+        if (state.currentView === 'log') refreshLog();
+        if (state.currentView === 'dashboard') refreshDashboard();
     }
 }
 
@@ -203,38 +219,4 @@ async function refreshLog() {
     document.getElementById('log-total-protein').textContent = `${Math.round(totalP)}g`;
     document.getElementById('log-total-carbs').textContent = `${Math.round(totalC)}g`;
     document.getElementById('log-total-fat').textContent = `${Math.round(totalF)}g`;
-}
-
-// ─── Suggest Meal ──────────────────────────────────────────────
-async function suggestMeal() {
-    const btn = document.getElementById('btn-suggest');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="btn-icon">⏳</span> Thinking...';
-
-    const data = await api('/api/suggest-meal');
-    const container = document.getElementById('meal-suggestion');
-
-    if (data.error || !data.suggestion) {
-        const isRateLimit = data.error && (data.error.includes('429') || data.error.includes('quota') || data.error.includes('503'));
-        const errorMsg = isRateLimit 
-            ? 'AI is temporarily rate-limited. Please wait a moment and try again.'
-            : 'Couldn\'t get suggestion. Try again in a moment.';
-        container.innerHTML = `<p style="color:var(--text-muted);font-size:0.85rem">${errorMsg}</p>
-            <button id="btn-suggest" class="btn btn-accent btn-full" onclick="suggestMeal()"><span class="btn-icon">✨</span> Try Again</button>`;
-        return;
-    }
-
-    const s = data.suggestion;
-    container.innerHTML = `<div class="suggestion-result">
-        <div class="suggestion-meal-name">${s.meal_name}</div>
-        <p class="suggestion-desc">${s.description}</p>
-        <div class="suggestion-macros">
-            <span class="suggestion-macro">🔥 ${s.estimated_calories} cal</span>
-            <span class="suggestion-macro">💪 ${s.estimated_protein}g protein</span>
-            <span class="suggestion-macro">🌾 ${s.estimated_carbs}g carbs</span>
-            <span class="suggestion-macro">🥑 ${s.estimated_fat}g fat</span>
-        </div>
-        <p class="suggestion-why">💡 ${s.why || ''}</p>
-        <button class="btn btn-accent btn-full" style="margin-top:0.75rem" onclick="suggestMeal()"><span class="btn-icon">🔄</span> Another Suggestion</button>
-    </div>`;
 }
